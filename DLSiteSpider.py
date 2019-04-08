@@ -51,18 +51,18 @@ with open('cache.html', 'r', encoding='utf-8') as f:
 
 soup = BeautifulSoup(html, 'lxml')
 
-'''for img in soup.find_all(name='img', attrs={'ref': 'popup_img'}):
-    print(getRawImgSrc(img['src']))'''
+srcList = []
+for img in soup.find_all(name='img', attrs={'ref': 'popup_img'}):
+    srcList.append(getRawImgSrc(img['src']))
 
-for dt in soup.find_all(name='dt', attrs={'class': 'work_name'}):
-    for img, a in zip(soup.find_all(name='img', attrs={'ref': 'popup_img'}), dt.find_all('a')):
-        print(getRawImgSrc(img['src']))
+
+for i, dt in enumerate(soup.find_all(name='dt', attrs={'class': 'work_name'})):
+    for a in dt.find_all('a'):
         #print(a.string + '\n' + a.get('href'))
         fp = OneMonthAgo + '/' + toAllowed(a.string.strip())
         mknewdir(fp)
         with open(fp + '/a.url', 'w', encoding='utf-8') as f:
             f.write('[InternetShortcut]\nurl=' + a.get('href'))
-        r = requests.get(getRawImgSrc(img['src']), headers = header, cookies = cookie)
-        with open(fp + os.path.basenaem(getRawImgSrc(img['src'])), 'wb') as f:
+        r = requests.get(srcList[i], headers = header, cookies = cookie)
+        with open(fp + '/' + os.path.basename(getRawImgSrc(img['src'])), 'wb') as f:
             f.write(r.content)
-#os.path.basename

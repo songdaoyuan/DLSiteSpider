@@ -3,10 +3,6 @@ import os
 import requests
 import datetime
 from bs4 import BeautifulSoup
-'''
-https://img.dlsite.jp/resize/images2/work/doujin/RJ248000/RJ247307_img_main_240x240.jpg
-https://img.dlsite.jp/modpub/images2/work/doujin/RJ248000/RJ247307_img_main.jpg
-'''
 
 
 def toAllowed(name):
@@ -26,9 +22,10 @@ def getRawImgSrc(imgsrc):
     return 'https:' + imgsrc.replace("resize", "modpub").replace("_240x240.jpg", ".jpg")
 
 
-url = 'https://www.dlsite.com/maniax/new/=/date/2019-02-27/work_type[0]/SOU/work_type[1]'
 OneMonthAgo = (datetime.datetime.now() - datetime.timedelta(days=31)
-               ).strftime('%Y.%m.%d')  # Count one month as 31 days
+               ).strftime('%Y-%m-%d')  # Count one month as 31 days
+url = 'https://www.dlsite.com/maniax/new/=/date/' + \
+    OneMonthAgo + '/work_type[0]/SOU/work_type[1]'
 
 mknewdir(OneMonthAgo)
 
@@ -44,10 +41,8 @@ cookie = {
     'lang': 'ja'
 }
 
-#r = requests.get(url, headers = header, cookies = cookie)
-#html = response.content.decode('utf-8')
-with open('cache.html', 'r', encoding='utf-8') as f:
-    html = f.read()
+r = requests.get(url, headers=header, cookies=cookie)
+html = r.content.decode('utf-8')
 
 soup = BeautifulSoup(html, 'lxml')
 
@@ -61,8 +56,10 @@ for i, dt in enumerate(soup.find_all(name='dt', attrs={'class': 'work_name'})):
         #print(a.string + '\n' + a.get('href'))
         fp = OneMonthAgo + '/' + toAllowed(a.string.strip())
         mknewdir(fp)
-        with open(fp + '/a.url', 'w', encoding='utf-8') as f:
+        with open(fp + '/index.url', 'w', encoding='utf-8') as f:
             f.write('[InternetShortcut]\nurl=' + a.get('href'))
-        r = requests.get(srcList[i], headers = header, cookies = cookie)
+        r = requests.get(srcList[i], headers=header, cookies=cookie)
         with open(fp + '/' + os.path.basename(getRawImgSrc(img['src'])), 'wb') as f:
             f.write(r.content)
+
+print('Done')

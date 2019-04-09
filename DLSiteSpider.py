@@ -19,13 +19,14 @@ def mknewdir(foldername):
 
 
 def getRawImgSrc(imgsrc):
-    return 'https:' + imgsrc.replace("resize", "modpub").replace("_240x240.jpg", ".jpg")
+    seq = ('https:', imgsrc.replace("resize", "modpub").replace("_240x240.jpg", ".jpg"))
+    return "".join(seq)
 
 
 OneMonthAgo = (datetime.datetime.now() - datetime.timedelta(days=31)
                ).strftime('%Y-%m-%d')  # Count one month as 31 days
-url = 'https://www.dlsite.com/maniax/new/=/date/' + \
-    OneMonthAgo + '/work_type[0]/SOU/work_type[1]'
+
+url = 'https://www.dlsite.com/maniax/new/=/date/%s/work_type[0]/SOU/work_type[1]' % OneMonthAgo
 
 mknewdir(OneMonthAgo)
 
@@ -54,12 +55,13 @@ for img in soup.find_all(name='img', attrs={'ref': 'popup_img'}):
 for i, dt in enumerate(soup.find_all(name='dt', attrs={'class': 'work_name'})):
     for a in dt.find_all('a'):
         #print(a.string + '\n' + a.get('href'))
-        fp = OneMonthAgo + '/' + toAllowed(a.string.strip())
+        fp = os.path.join(OneMonthAgo, toAllowed(a.string.strip()))
+        print(fp)
         mknewdir(fp)
-        with open(fp + '/index.url', 'w', encoding='utf-8') as f:
-            f.write('[InternetShortcut]\nurl=' + a.get('href'))
+        with open(os.path.join(fp, 'index.url'), 'w', encoding='utf-8') as f:
+            f.write('[InternetShortcut]\nurl=%s' % a.get('href'))
         r = requests.get(srcList[i], headers=header, cookies=cookie)
-        with open(fp + '/' + os.path.basename(srcList[i]), 'wb') as f:
+        with open(os.path.join(fp, os.path.basename(srcList[i])), 'wb') as f:
             f.write(r.content)
 
 print('Done')

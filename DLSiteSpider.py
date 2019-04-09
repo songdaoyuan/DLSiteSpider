@@ -59,7 +59,7 @@ for i, dt in enumerate(soup.find_all(name='dt', attrs={'class': 'work_name'})):
         with open(fp + '/index.url', 'w', encoding='utf-8') as f:
             f.write('[InternetShortcut]\nurl=' + a.get('href'))
         r = requests.get(srcList[i], headers=header, cookies=cookie)
-        with open(fp + '/' + os.path.basename(getRawImgSrc(img['src'])), 'wb') as f:
+        with open(fp + '/' + os.path.basename(srcList[i]), 'wb') as f:
             f.write(r.content)
 
 print('Done')

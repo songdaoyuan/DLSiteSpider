@@ -15,3 +15,5 @@ Use pip to install:
 `pip install BeautifulSopu4 requests lxml`
 
 ## This program count one month as 31 days, you can edit it in line 26
+
+This program will rebuild soon
